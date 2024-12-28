@@ -1,0 +1,175 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  characters Character[]
+  createdAt  DateTime    @default(now())
+  email      String?     @unique
+  firstName  String?
+  id         String      @id @default(cuid())
+  lastName   String?
+  password   String
+  roles      Json
+  updatedAt  DateTime    @updatedAt
+  username   String      @unique
+}
+
+model Character {
+  createdAt DateTime               @default(now())
+  id        String                 @id @default(cuid())
+  image     String?
+  items     Item[]
+  name      String?
+  statuses  EnumCharacterStatuses?
+  trackers  Tracker[]
+  traitSets TraitSet[]
+  updatedAt DateTime               @updatedAt
+  user      User?                  @relation(fields: [userId], references: [id])
+  userId    String?
+}
+
+model Tracker {
+  character   Character? @relation(fields: [characterId], references: [id])
+  characterId String?
+  createdAt   DateTime   @default(now())
+  id          String     @id @default(cuid())
+  name        String?
+  numberField Int?
+  updatedAt   DateTime   @updatedAt
+}
+
+model TraitSet {
+  characters Character[]
+  createdAt  DateTime    @default(now())
+  id         String      @id @default(cuid())
+  name       String?
+  traits     Trait[]
+  updatedAt  DateTime    @updatedAt
+}
+
+model Trait {
+  bonus      String?
+  createdAt  DateTime  @default(now())
+  formula    String?
+  id         String    @id @default(cuid())
+  name       String?
+  traitSet   TraitSet? @relation(fields: [traitSetId], references: [id])
+  traitSetId String?
+  updatedAt  DateTime  @updatedAt
+}
+
+model Item {
+  character     Character[]
+  createdAt     DateTime    @default(now())
+  description   String?
+  id            String      @id @default(cuid())
+  image         String?
+  isPublic      Boolean?
+  itemBonuses   ItemBonus?  @relation(fields: [itemBonusesId], references: [id])
+  itemBonusesId String?
+  name          String?
+  updatedAt     DateTime    @updatedAt
+}
+
+model ItemBonus {
+  bonus            String?
+  createdAt        DateTime @default(now())
+  formula          String?
+  id               String   @id @default(cuid())
+  isBonusReplace   Boolean?
+  isFormulaReplace Boolean?
+  items            Item[]
+  traitName        String?
+  updatedAt        DateTime @updatedAt
+}
+
+model Status {
+  createdAt DateTime @default(now())
+  fromField String?
+  id        String   @id @default(cuid())
+  to        String?
+  updatedAt DateTime @updatedAt
+}
+
+model Time {
+  createdAt        DateTime @default(now())
+  id               String   @id @default(cuid())
+  isPaused         Boolean?
+  seasons          Season[]
+  seconds          String?
+  secondsPerSecond String?
+  updatedAt        DateTime @updatedAt
+}
+
+model Season {
+  createdAt DateTime @default(now())
+  id        String   @id @default(cuid())
+  time      Time?    @relation(fields: [timeId], references: [id])
+  timeId    String?
+  updatedAt DateTime @updatedAt
+}
+
+model Weather {
+  createdAt       DateTime @default(now())
+  id              String   @id @default(cuid())
+  rainIntensity   String?
+  rainProbability String?
+  tempMax         String?
+  tempMin         String?
+  updatedAt       DateTime @updatedAt
+}
+
+model SeasonColor {
+  color     String?
+  createdAt DateTime                  @default(now())
+  id        String                    @id @default(cuid())
+  typeField EnumSeasonColorTypeField?
+  updatedAt DateTime                  @updatedAt
+}
+
+model Moon {
+  color       String?
+  createdAt   DateTime @default(now())
+  id          String   @id @default(cuid())
+  name        String?
+  period      String?
+  secondStart String?
+  updatedAt   DateTime @updatedAt
+}
+
+model Reminder {
+  createdAt    DateTime @default(now())
+  description  String?
+  id           String   @id @default(cuid())
+  name         String?
+  seconds      String?
+  shouldNotify String?
+  shouldPause  String?
+  updatedAt    DateTime @updatedAt
+}
+
+model Player {
+  color     String?
+  createdAt DateTime @default(now())
+  id        String   @id @default(cuid())
+  image     String?
+  name      String?
+  updatedAt DateTime @updatedAt
+}
+
+enum EnumCharacterStatuses {
+  Option1
+}
+
+enum EnumSeasonColorTypeField {
+  Dawn
+  Noon
+  Dusk
+  Night
+}
